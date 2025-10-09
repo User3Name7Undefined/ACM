@@ -52,29 +52,56 @@ public:
         if(step>=0) x=(ui128)x*multiplier%MOD;
         else x=(ui128)x*multiplier%MOD;
     }
-}hash1((ull)1e18+3,2,N),hash2((ull)1e18+9,2,N);
+}hash1((ull)1e18+3,131,N)
+// ,hash2((ull)1e9+9,257,N)
+;
+
+// class phh{
+// private:
+//     ull h1,h2;
+// public:
+//     phh(ull h1=0,ull h2=0):h1(h1),h2(h2){}
+//     phh(int x):h1(hash1(x)),h2(hash2(x)){}
+//     phh operator+(const phh& other){
+//         return phh(hash1.add(h1,other.h1),hash2.add(h2,other.h2));
+//     }
+//     phh moved(int step){
+//         return phh(hash1.moved(h1,step),hash2.moved(h2,step));
+//     }
+//     bool operator==(const phh& other)const{
+//         return h1==other.h1&&h2==other.h2;
+//     }
+//     void move(int step){
+//         hash1.move(h1,step);
+//         hash2.move(h2,step);
+//     }
+//     void out(){
+//         cout<<h1<<' '<<h2<<endl;
+//     }
+// };
 
 class phh{
 private:
-    ull h1,h2;
+    ull h;
 public:
-    phh(ull h1=0,ull h2=0):h1(h1),h2(h2){}
-    phh(int x):h1(hash1(x)),h2(hash2(x)){}
+    phh(){h=0;}
+    phh(ull h):h(hash1(h)){}
     phh operator+(const phh& other){
-        return phh(hash1.add(h1,other.h1),hash2.add(h2,other.h2));
+        phh ans;
+        ans.h=hash1.add(h,other.h);
+        return ans;
+        // return {hash1.add(h,other.h)};
     }
     phh moved(int step){
-        return phh(hash1.moved(h1,step),hash2.moved(h2,step));
+        phh ans;
+        ans.h=hash1.moved(h,step);
+        return ans;
     }
     bool operator==(const phh& other)const{
-        return h1==other.h1&&h2==other.h2;
+        return h==other.h;
     }
     void move(int step){
-        hash1.move(h1,step);
-        hash2.move(h2,step);
-    }
-    void out(){
-        cout<<h1<<' '<<h2<<endl;
+        hash1.move(h,step);
     }
 };
 
@@ -141,7 +168,8 @@ private:
             else return tree[u].hashn;
         }
         push_down(u,L,R);
-        phh ans={0,0};
+        //phh ans={0,0};
+        phh ans=0;
         if(l<=mid)ans=ans+query_hash(ls(u),L,mid,l,r,sig);
         if(r>mid)ans=ans+query_hash(rs(u),mid+1,R,l,r,sig);
         return ans;
@@ -166,7 +194,10 @@ public:
         int sum=query_sum(l,r);
         if(sum*2%(r-l+1)!=0)return false;
         int step=sum*2/(r-l+1);
-        if(query_hash(l,r,false).moved(step)==query_hash(l,r,true)){
+        phh aa=query_hash(l,r,false);
+        aa=aa.moved(step);
+        phh bb=query_hash(l,r,true);
+        if(aa==bb){
             return true;
         }else{
             return false;
