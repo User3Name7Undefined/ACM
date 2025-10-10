@@ -1,13 +1,13 @@
 #include<bits/stdc++.h>
 #define ull unsigned long long
-#define ui128 __uint128_t
+#define ui128 ull
 #define int long long
 #define endl '\n'
 
 using namespace std;
 
 const int N=200000;
-const ull MOD=(ull)1e18+3;
+const ull MOD=(ull)1e9+7;
 
 ull qpo(ull x,ull k){
     ull res=1ull;
@@ -24,33 +24,32 @@ const ull b2=3,invb2=qpo(b2,MOD-2ull);
 
 int n,q;
 int a[N+5];
-ull pop1[N+5],pop2[N+5],pon1[N+5],pon2[N+5];
+ull pop1[N+5],pon1[N+5];
+//ull pop2[N+5],pon2[N+5];
 
 struct hh{
-    ull hp1,hp2,hn1,hn2;
+    ull hp1,hn1;
+    //ull hp2,hn2;
     hh operator+(const hh& other)const{
         return{
             (hp1+other.hp1)%MOD,
-            (hp2+other.hp2)%MOD,
+            //(hp2+other.hp2)%MOD,
             (hn1+other.hn1)%MOD,
-            (hn2+other.hn2)%MOD,
+            //(hn2+other.hn2)%MOD,
         };
     }
     void update(int v){
         if(v<=N){
             hp1=(ui128)hp1*pop1[v]%MOD;
-            hp2=(ui128)hp2*pop2[v]%MOD;
+            //hp2=(ui128)hp2*pop2[v]%MOD;
             hn1=(ui128)hn1*pon1[v]%MOD;
-            hn2=(ui128)hn2*pon2[v]%MOD;
+            //hn2=(ui128)hn2*pon2[v]%MOD;
         }else{
-            hp1=(ui128)hp1*qpo(b1,v);
-            hp2=(ui128)hp1*qpo(b2,v);
-            hn1=(ui128)hn1*qpo(invb1,v);
-            hn2=(ui128)hn1*qpo(invb2,v);
+            hp1=(ui128)hp1*qpo(b1,v)%MOD;
+            //hp2=(ui128)hp1*qpo(b2,v);
+            hn1=(ui128)hn1*qpo(invb1,v)%MOD;
+            //hn2=(ui128)hn1*qpo(invb2,v);
         }
-    }
-    void out(){
-        cout<<hp1<<' '<<hp2<<' '<<hn1<<' '<<hn2<<endl;
     }
 };
 
@@ -67,12 +66,13 @@ struct Node{
 #define mid ((Lu+Ru)/2)
 
 void init(){
-    pop1[0]=pop2[0]=pon1[0]=pon2[0]=1ull;
+    pop1[0]=pon1[0]=1ull;
+    //pop2[0]=pon2[0]=1ull;
     for(int i=1;i<=N;++i){
         pop1[i]=(ui128)pop1[i-1]*b1%MOD;
-        pop2[i]=(ui128)pop2[i-1]*b2%MOD;
+        //pop2[i]=(ui128)pop2[i-1]*b2%MOD;
         pon1[i]=(ui128)pon1[i-1]*invb1%MOD;
-        pon2[i]=(ui128)pon2[i-1]*invb2%MOD;
+        //pon2[i]=(ui128)pon2[i-1]*invb2%MOD;
     }
 }
 
@@ -98,7 +98,8 @@ int build(int L,int R){
         tree[u]={
             0,0,L,R,
             0,a[L],
-            {pop1[a[L]],pop2[a[L]],pon1[a[L]],pon2[a[L]]}
+            pop1[a[L]],//pop2[a[L]]
+            pon1[a[L]],//pon2[a[L]]
         };
         return u;
     }
@@ -133,7 +134,7 @@ hh query_hash(int l,int r,int u=1){
         return tree[u].hpn;
     }
     push_down(u);
-    hh ans={0ull,0ull,0ull,0ull};
+    hh ans={0ull,0ull};
     if(l<=mid)ans=ans+query_hash(l,r,lsu);
     if(r>mid)ans=ans+query_hash(l,r,rsu);
     return ans;
@@ -156,10 +157,10 @@ void solve(int round){
                 continue;
             }
             int move=sum*2/(r-l+1);
-            auto[p1,p2,n1,n2]=query_hash(l,r);
+            auto[p1,n1]=query_hash(l,r);
             if(
-                (ui128)n1*qpo(b1,move)%MOD==p1&&
-                (ui128)n2*qpo(b2,move)%MOD==p2
+                (ui128)n1*qpo(b1,move)%MOD==p1
+                //(ui128)n2*qpo(b2,move)%MOD==p2
             ){
                 cout<<"Yes"<<endl;
             }else{
